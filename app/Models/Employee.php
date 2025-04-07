@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     protected $fillable = [
-        'user_id', 'employee_number', 'hire_date', 'birth_date',
+        'name', 'user_id', 'employee_number', 'hire_date', 'birth_date',
         'gender', 'national_id', 'address', 'phone',
         'emergency_contact', 'position', 'salary'
     ];
@@ -21,5 +21,10 @@ class Employee extends Model
     {
         return $this->belongsToMany(Department::class, 'employee_department')
                    ->withPivot('position', 'start_date', 'end_date');
+    }
+
+    public function payroll()
+    {
+        return $this->hasMany(Payroll::class);
     }
 }

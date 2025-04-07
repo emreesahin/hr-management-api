@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DepartmentController;
 use App\Http\Controllers\API\EmployeeController;
+use App\Http\Controllers\API\PayrollController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{department}/hierarchy', [DepartmentController::class, 'hierarchy']);
         Route::get('/{department}/report', [DepartmentController::class, 'report']);
     });
+
+    // Payroll Management
+    Route::prefix('payrolls')->group(function () {
+        Route::get('/', [PayrollController::class, 'index']);
+        Route::get('/{id}/download', [PayrollController::class, 'download']);
+
+        Route::middleware('role:admin|hr')->group(function () {
+            Route::post('/', [PayrollController::class, 'store']);
+        });
+    });
+
+
+
+
+
 
     // Employee Management
     Route::prefix('employees')->group(function () {
