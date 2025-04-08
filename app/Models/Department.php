@@ -56,15 +56,10 @@ class Department extends Model
     /**
      * Get all employees in this department
      */
-    public function employees(): BelongsToMany
+    public function employees()
     {
-        return $this->belongsToMany(User::class, 'employee_department')
-                   ->withPivot([
-                       'position',
-                       'start_date',
-                       'end_date'
-                   ])
-                   ->withTimestamps();
+        return $this->belongsToMany(User::class, 'employee_department', 'department_id', 'employee_id')
+            ->withPivot('position', 'start_date', 'end_date');
     }
 
     // Scopes

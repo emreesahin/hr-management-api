@@ -11,9 +11,9 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
         // Roller
-        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'api']);
-        $hrRole = Role::create(['name' => 'hr', 'guard_name' => 'api']);
-        $employeeRole = Role::create(['name' => 'employee', 'guard_name' => 'api']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'api']);
+        $hrRole = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'api']);
+        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'api']);
 
         // İzinler
         $permissions = [
@@ -26,13 +26,17 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission, 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'api']);
         }
 
         // Admin rolüne tüm izinleri ver
-        $adminRole->givePermissionTo(Permission::all());
+        $adminRole->syncPermissions(Permission::all());
 
         // HR rolüne bazı izinler ver
-        $hrRole->givePermissionTo(['view users', 'create users', 'edit users']);
+        $hrRole->syncPermissions([
+            'view users',
+            'create users',
+            'edit users',
+        ]);
     }
 }

@@ -15,67 +15,89 @@ class DepartmentController extends Controller
     // Department List
     public function index (Request $request) {
 
-        $request -> validate([
-            'with_employees' => 'sometimes|boolean',
-            'only_active' => 'sometimes|boolean'
-        ]);
-
-        $query = Deparment::query();
-
-        if($request -> boolean('with_employees')) {
-            $query -> with([
-                'activeEmployees' => function ($query) {
-                    $query -> select(['user.id', 'name', 'email'])
-                        ->withPivot('position');
-
-                }
+        try {
+            $request -> validate([
+                'with_employees' => 'sometimes|boolean',
+                'only_active' => 'sometimes|boolean'
             ]);
 
-        if($request -> boolean('only_active')) {
-            $query -> where('is_active', true);
+            $query = Department::query();
+
+            if($request -> boolean('with_employees')) {
+                $query -> with([
+                    'activeEmployees' => function ($query) {
+                        $query -> select(['user.id', 'name', 'email'])
+                            ->withPivot('position');
+
+                    }
+                ]);
+
+            if($request -> boolean('only_active')) {
+                $query -> where('is_active', true);
+            }
+
+            $departments = $query -> whereNull('parent_id')-> get();
+
+            return response()->json([
+                $this->buildTree($departments)
+            ]);
+
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Departmanlar listelenemedi',
+                'errors' => $e -> getMessage(),
+            ]);
         }
 
-        $departments = $query -> whereNull('parent_id')-> get();
 
-        return response()->json([
-            $this->buildTree($departments)
-        ]);
-
-        }
     }
 
     // Create Department
 
     public function store(Request $request) {
-        $validated = $request -> validate([
-            'name' => 'required|string|max:255|unique:departments',
-            'description' => 'nullable|string',
-            'manager_id' => [
-                'nullable',
-                'integer',
-                Rule::exist('user', 'id')->where(function($query) {
-                    $query->where('is_active', true);
-                })
-            ],
-            'parent_id' => 'nullable|exists:departments:id',
-            'is_active' => 'boolean'
-        ]);
+
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:departments',
+                'description' => 'nullable|string',
+                'manager_id' => [
+                    'nullable',
+                    'integer',
+                    Rule::exists('users', 'id')->where(function ($query) {
+                        $query->where('is_active', true);
+                    }),
+                ],
+                'parent_id' => 'nullable|exists:departments,id',
+                'is_active' => 'boolean'
+            ]);
 
 
-        if($validated['manager_id'] && $this->isUserManagerElsewhere($validated['manager_id']))
-    {
-        return response()->json([
-            'message' => 'Bu kullanıcı zaten başka bir departmanda yönetici',
-            'errors' => ['manager_id' => ['User is already manager of another department']]
-        ], 422);
-    }
+            if (
+                isset($validated['manager_id']) &&
+                $validated['manager_id'] &&
+                $this->isUserManagerElsewhere($validated['manager_id'])
+            ) {
+                return response()->json([
+                    'message' => 'Bu kullanıcı zaten başka bir departmanda yönetici',
+                    'errors' => ['manager_id' => ['User is already manager of another department']]
+                ], 422);
+            }
 
-    $department = Department::create($validated);
 
-    return response() -> json([
-        'message' => 'Departman başarıyla oluşturuldu',
-        'data' => $department
-    ], 201);
+        $department = Department::create($validated);
+
+        return response() -> json([
+            'message' => 'Departman başarıyla oluşturuldu',
+            'data' => $department
+        ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Departman oluşturulamadı',
+                'error' => $e->getMessage()
+            ]);
+        }
 
     }
 
@@ -83,17 +105,25 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
-        return response()->json([
-            'department' => $department->load(['manager', 'parent']),
-            'employees' => $department->activeEmployees()
-                ->select(['users.id', 'name', 'email', 'phone'])
-                ->withPivot('position', 'start_date')
-                ->get(),
-            'stats' => [
-                'employee_count' => $department->activeEmployees->count(),
-                'sub_departments' => $department->children()->count()
-            ]
-        ]);
+        try {
+            return response()->json([
+                'department' => $department->load(['manager', 'parent']),
+                'employees' => $department->activeEmployees()
+                    ->select(['users.id', 'name', 'email'])
+                    ->withPivot('position', 'start_date')
+                    ->get(),
+                'stats' => [
+                    'employee_count' => $department->activeEmployees->count(),
+                    'sub_departments' => $department->children()->count()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Departman bilgileri getirilemedi',
+                'errors' => $e->getMessage()
+            ]);
+        }
+
     }
 
     // Update Department
@@ -175,42 +205,50 @@ class DepartmentController extends Controller
 
     public function assignEmployee(Request $request, Department $department)
     {
-        $validated = $request->validate([
-            'employee_id' => [
-                'required',
-                'integer',
-                Rule::exists('users', 'id')->where('is_active', true),
-                function ($attribute, $value, $fail) use ($department) {
-                    if ($department->employees()->where('users.id', $value)->wherePivotNull('end_date')->exists()) {
-                        $fail('Bu çalışan zaten bu departmanda aktif olarak görev yapıyor');
+        try {
+            $validated = $request->validate([
+                'employee_id' => [
+                    'required',
+                    'integer',
+                    Rule::exists('users', 'id')->where('is_active', true),
+                    function ($attribute, $value, $fail) use ($department) {
+                        if ($department->employees()->where('users.id', $value)->wherePivotNull('end_date')->exists()) {
+                            $fail('Bu çalışan zaten bu departmanda aktif olarak görev yapıyor');
+                        }
                     }
-                }
-            ],
-            'position' => 'required|string|max:255',
-            'start_date' => 'nullable|date|before_or_equal:today',
-            'end_date' => 'nullable|date|after:start_date'
-        ]);
+                ],
+                'position' => 'required|string|max:255',
+                'start_date' => 'nullable|date|before_or_equal:today',
+                'end_date' => 'nullable|date|after:start_date'
+            ]);
 
-        // Eski departman atamasını kapat
-        DB::table('employee_department')
-            ->where('employee_id', $validated['employee_id'])
-            ->whereNull('end_date')
-            ->update(['end_date' => now()]);
+            // Eski departman atamasını kapat
+            DB::table('employee_department')
+                ->where('employee_id', $validated['employee_id'])
+                ->whereNull('end_date')
+                ->update(['end_date' => now()]);
 
-        $department->employees()->attach($validated['employee_id'], [
-            'position' => $validated['position'],
-            'start_date' => $validated['start_date'] ?? now(),
-            'end_date' => $validated['end_date'] ?? null
-        ]);
-
-        return response()->json([
-            'message' => 'Çalışan departmana atandı',
-            'data' => [
-                'employee' => User::find($validated['employee_id'])->only(['id', 'name', 'email']),
+            $department->employees()->attach($validated['employee_id'], [
                 'position' => $validated['position'],
-                'department' => $department->only(['id', 'name'])
-            ]
-        ], 201);
+                'start_date' => $validated['start_date'] ?? now(),
+                'end_date' => $validated['end_date'] ?? null
+            ]);
+
+            return response()->json([
+                'message' => 'Çalışan departmana atandı',
+                'data' => [
+                    'employee' => User::find($validated['employee_id'])->only(['id', 'name', 'email']),
+                    'position' => $validated['position'],
+                    'department' => $department->only(['id', 'name'])
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Departman atama basarısız',
+                'error' => $e->getMessage()
+            ]);
+        }
+
     }
 
 
