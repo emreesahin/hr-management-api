@@ -58,7 +58,7 @@ class Department extends Model
      */
     public function employees()
     {
-        return $this->belongsToMany(User::class, 'employee_department', 'department_id', 'employee_id')
+        return $this->belongsToMany(Employee::class, 'employee_department', 'department_id', 'employee_id')
             ->withPivot('position', 'start_date', 'end_date');
     }
 

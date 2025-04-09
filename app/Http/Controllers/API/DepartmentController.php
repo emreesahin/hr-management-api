@@ -13,45 +13,42 @@ class DepartmentController extends Controller
 {
 
     // Department List
-    public function index (Request $request) {
-
+    public function index(Request $request)
+    {
         try {
-            $request -> validate([
+            $request->validate([
                 'with_employees' => 'sometimes|boolean',
                 'only_active' => 'sometimes|boolean'
             ]);
 
             $query = Department::query();
 
-            if($request -> boolean('with_employees')) {
-                $query -> with([
+            if ($request->boolean('with_employees')) {
+                $query->with([
                     'activeEmployees' => function ($query) {
-                        $query -> select(['user.id', 'name', 'email'])
+                        $query->select(['users.id', 'name', 'email'])
                             ->withPivot('position');
-
                     }
                 ]);
-
-            if($request -> boolean('only_active')) {
-                $query -> where('is_active', true);
             }
 
-            $departments = $query -> whereNull('parent_id')-> get();
+            if ($request->boolean('only_active')) {
+                $query->where('is_active', true);
+            }
+
+            $departments = $query->whereNull('parent_id')->get();
 
             return response()->json([
                 $this->buildTree($departments)
             ]);
-
-            }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Departmanlar listelenemedi',
-                'errors' => $e -> getMessage(),
+                'errors' => $e->getMessage(),
             ]);
         }
-
-
     }
+
 
     // Create Department
 

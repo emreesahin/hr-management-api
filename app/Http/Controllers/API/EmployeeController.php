@@ -12,7 +12,6 @@ use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
-    // Tüm çalışanları listele
     public function index()
     {
         return Employee::with(['user', 'departments' => function($query) {
@@ -20,7 +19,6 @@ class EmployeeController extends Controller
         }])->get();
     }
 
-    // Tek çalışan detayı
     public function show(Employee $employee)
     {
         return response()->json([
@@ -28,29 +26,70 @@ class EmployeeController extends Controller
             'assignment_history' => $employee->assignmentHistory()
         ]);
     }
-
-    // Yeni çalışan oluştur
     public function store(Request $request)
-    {
-        $validated = $this->validateEmployeeData($request);
+{
+    $validated = $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'department_id' => 'required|exists:departments,id',
+        'position' => 'required|string|max:255',
+        'salary' => 'required|numeric|min:0',
+        'hire_date' => 'required|date',
+        'birth_date' => 'required|date|before:today',
+        'gender' => ['required', Rule::in(['male', 'female', 'other'])],
+        'national_id' => ['required', 'string', 'max:20', Rule::unique('employees', 'national_id')],
+        'address' => 'required|string|max:500',
+        'phone' => 'required|string|max:15',
+        'emergency_contact' => 'required|string|max:15'
+    ]);
 
-        DB::beginTransaction();
-        try {
-            $employee = $this->createEmployee($validated);
-            DB::commit();
+    DB::beginTransaction();
 
+    try {
+        $user = User::findOrFail($validated['user_id']);
+
+        if ($user->employee) {
             return response()->json([
-                'message' => 'Çalışan başarıyla oluşturuldu',
-                'data' => $employee
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->errorResponse($e);
+                'message' => 'Bu kullanıcı zaten çalışan olarak tanımlanmış.'
+            ], 422);
         }
-    }
 
-    // Çalışan güncelle
+        // employee_number oluştur
+        $nextId = Employee::max('id') + 1;
+        $employeeNumber = 'EMP-' . now()->format('Ymd') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+
+        // Employee kaydı oluştur
+        $employee = $user->employee()->create([
+            'employee_number' => $employeeNumber,
+            'position' => $validated['position'],
+            'salary' => $validated['salary'],
+            'hire_date' => $validated['hire_date'],
+            'birth_date' => $validated['birth_date'],
+            'gender' => $validated['gender'],
+            'national_id' => $validated['national_id'],
+            'address' => $validated['address'],
+            'phone' => $validated['phone'],
+            'emergency_contact' => $validated['emergency_contact'],
+        ]);
+
+        // Departmana ata
+        $employee->departments()->attach($validated['department_id']);
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Çalışan başarıyla oluşturuldu',
+            'data' => $employee->load('user', 'departments')
+        ], 201);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Bir hata oluştu',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
     public function update(Request $request, Employee $employee)
     {
         $validated = $this->validateEmployeeData($request, $employee->user_id);
@@ -71,7 +110,6 @@ class EmployeeController extends Controller
         }
     }
 
-    // Çalışan sil (soft delete)
     public function destroy(Employee $employee)
     {
         DB::beginTransaction();
@@ -89,7 +127,6 @@ class EmployeeController extends Controller
         }
     }
 
-    // Departmana atama
     public function assignToDepartment(Request $request, Employee $employee)
     {
         $validated = $request->validate([
@@ -114,7 +151,6 @@ class EmployeeController extends Controller
         }
     }
 
-    // Departman atamasını güncelle
     public function updateDepartmentAssignment(Request $request, Employee $employee, Department $department)
     {
         $validated = $request->validate([
@@ -139,7 +175,6 @@ class EmployeeController extends Controller
         }
     }
 
-    // Atama geçmişi
     public function assignmentHistory(Employee $employee)
     {
         return response()->json([
@@ -149,13 +184,10 @@ class EmployeeController extends Controller
         ]);
     }
 
-    /******************* PRIVATE METHODS *******************/
-
     private function validateEmployeeData(Request $request, $ignoreUserId = null)
     {
         $rules = [
-            'name' => 'required|string|max:255',
-            'email' => ['required','email',Rule::unique('users')->ignore($ignoreUserId)],
+            'user_id' => 'required|exists:users,id',
             'position' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date',
@@ -167,21 +199,12 @@ class EmployeeController extends Controller
             'emergency_contact' => 'required|string|max:15'
         ];
 
-        if (!$ignoreUserId) {
-            $rules['password'] = 'required|string|min:8';
-        }
-
         return $request->validate($rules);
     }
 
     private function createEmployee(array $validated)
     {
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'is_active' => true
-        ]);
+        $user = User::findOrFail($validated['user_id']);
 
         return $user->employee()->create([
             'employee_number' => 'EMP'.strtoupper(uniqid()),
@@ -199,11 +222,6 @@ class EmployeeController extends Controller
 
     private function updateEmployee(Employee $employee, array $validated)
     {
-        $employee->user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email']
-        ]);
-
         $employee->update([
             'position' => $validated['position'],
             'salary' => $validated['salary'],

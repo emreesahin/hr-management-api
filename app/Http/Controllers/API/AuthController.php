@@ -18,19 +18,8 @@ class AuthController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|unique:users',
-                'password' => 'required|string|min:8|confirmed',
-
-                'hire_date' => 'required|date',
-                'birth_date' => 'required|date',
-                'gender' => 'required|string|in:male,female,other',
-                'national_id' => 'required|string',
-                'address' => 'required|string',
-                'phone' => 'required|string',
-                'emergency_contact' => 'required|string',
-                'position' => 'required|string',
-                'salary' => 'required|numeric|min:0'
+                'password' => 'required|string|min:8|confirmed'
             ]);
-
 
             $user = User::create([
                 'name' => $request->name,
@@ -41,38 +30,18 @@ class AuthController extends Controller
 
             $user->assignRole('employee');
 
-
-            $lastId = \App\Models\Employee::max('id') + 1;
-            $employeeNumber = 'EMP-' . now()->format('Ymd') . '-' . str_pad($lastId, 4, '0', STR_PAD_LEFT);
-
-
-            $user->employee()->create([
-                'employee_number' => $employeeNumber,
-                'hire_date' => $request->hire_date,
-                'birth_date' => $request->birth_date,
-                'gender' => $request->gender,
-                'national_id' => $request->national_id,
-                'address' => $request->address,
-                'phone' => $request->phone,
-                'emergency_contact' => $request->emergency_contact,
-                'position' => $request->position,
-                'salary' => $request->salary,
-                'name' => $request->name // $user->name
-            ]);
-
             return response()->json([
-                'message' => 'Kullanıcı ve çalışan başarıyla oluşturuldu.',
+                'message' => 'Kullanıcı başarıyla kaydedildi',
                 'user' => $user
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Kullanıcı kaydedilemedi',
+                'message' => 'Kayıt sırasında hata oluştu',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
-
 
 
        // Login

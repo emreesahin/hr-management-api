@@ -22,6 +22,8 @@ use App\Http\Controllers\API\PayrollController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
+Route::post('/', [DepartmentController::class, 'store']);
+
 // Authenticated Routes (Sanctum)
 Route::middleware(['auth:sanctum'])->group(function () {
     // Auth Routes
@@ -31,7 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Department Management
     Route::prefix('departments')->group(function () {
         Route::get('/', [DepartmentController::class, 'index']);
-        Route::post('/', [DepartmentController::class, 'store']);
+
         Route::get('/{department}', [DepartmentController::class, 'show']);
         Route::put('/{department}', [DepartmentController::class, 'update']);
         Route::delete('/{department}', [DepartmentController::class, 'destroy']);
@@ -42,22 +44,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{department}/report', [DepartmentController::class, 'report']);
     });
 
-    // Payroll Management
-    Route::prefix('payrolls')->group(function () {
-        Route::get('/', [PayrollController::class, 'index']);
-        Route::get('/{id}/download', [PayrollController::class, 'download']);
-
-        Route::middleware('role:admin|hr')->group(function () {
-            Route::post('/', [PayrollController::class, 'store']);
-        });
-    });
-
-
-
-
-
-
-    // Employee Management
+      // Employee Management
     Route::prefix('employees')->group(function () {
         Route::get('/', [EmployeeController::class, 'index']);
         Route::post('/', [EmployeeController::class, 'store']);
@@ -73,6 +60,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{employee}/history', [EmployeeController::class, 'assignmentHistory']);
     });
 
+
+
+    // Payroll Management
+    Route::prefix('payrolls')->group(function () {
+        Route::get('/', [PayrollController::class, 'index']);
+        Route::get('/{id}/download', [PayrollController::class, 'download']);
+
+        Route::middleware('role:admin|hr')->group(function () {
+            Route::post('/', [PayrollController::class, 'store']);
+        });
+    });
+
+
+
     // HR Dashboard Endpoints
     Route::prefix('hr')->middleware('role:hr|admin')->group(function () {
         Route::get('/dashboard', 'HrController@dashboard');
@@ -87,3 +88,6 @@ Route::fallback(function () {
         'status' => 404
     ], 404);
 });
+
+
+
