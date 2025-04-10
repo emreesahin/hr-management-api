@@ -23,9 +23,10 @@ return new class extends Migration
         });
 
         Schema::create('employee_department', function (Blueprint $table) {
-            $table->foreignId('employee_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->foreignId('department_id')->constrained()->cascadeOnDelete();
             $table->string('position');
+            $table->boolean('is_primary')->default(false);
             $table->date('start_date')->default(DB::raw('(CURRENT_DATE)'));
             $table->date('end_date')->nullable();
             $table->timestamps();

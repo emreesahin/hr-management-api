@@ -12,13 +12,18 @@ use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
+    // Show Employees
     public function index()
     {
-        return Employee::with(['user', 'departments' => function($query) {
-            $query->wherePivotNull('end_date')->orWherePivot('end_date', '>', now());
+        return Employee::with(['user', 'departments' => function ($query) {
+            $query->where(function ($q) {
+                $q->whereNull('employee_department.end_date')
+                  ->orWhere('employee_department.end_date', '>', now());
+            });
         }])->get();
     }
 
+    // Show Employee
     public function show(Employee $employee)
     {
         return response()->json([
@@ -26,76 +31,89 @@ class EmployeeController extends Controller
             'assignment_history' => $employee->assignmentHistory()
         ]);
     }
+
+    // Create Employee
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'department_id' => 'required|exists:departments,id',
-        'position' => 'required|string|max:255',
-        'salary' => 'required|numeric|min:0',
-        'hire_date' => 'required|date',
-        'birth_date' => 'required|date|before:today',
-        'gender' => ['required', Rule::in(['male', 'female', 'other'])],
-        'national_id' => ['required', 'string', 'max:20', Rule::unique('employees', 'national_id')],
-        'address' => 'required|string|max:500',
-        'phone' => 'required|string|max:15',
-        'emergency_contact' => 'required|string|max:15'
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-        $user = User::findOrFail($validated['user_id']);
-
-        if ($user->employee) {
+    {
+        try {
+            $validated = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'department_id' => 'required|exists:departments,id',
+                'position' => 'required|string|max:255',
+                'salary' => 'required|numeric|min:0',
+                'hire_date' => 'required|date',
+                'birth_date' => 'required|date|before:today',
+                'gender' => ['required', Rule::in(['male', 'female', 'other'])],
+                'national_id' => ['required', 'string', 'max:20', Rule::unique('employees', 'national_id')],
+                'address' => 'required|string|max:500',
+                'phone' => 'required|string|max:15',
+                'emergency_contact' => 'required|string|max:50'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'message' => 'Bu kullanıcı zaten çalışan olarak tanımlanmış.'
+                'message' => 'Validation error',
+                'errors' => $e->errors()
             ], 422);
         }
 
-        // employee_number oluştur
-        $nextId = Employee::max('id') + 1;
-        $employeeNumber = 'EMP-' . now()->format('Ymd') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+        DB::beginTransaction();
 
-        // Employee kaydı oluştur
-        $employee = $user->employee()->create([
-            'employee_number' => $employeeNumber,
-            'position' => $validated['position'],
-            'salary' => $validated['salary'],
-            'hire_date' => $validated['hire_date'],
-            'birth_date' => $validated['birth_date'],
-            'gender' => $validated['gender'],
-            'national_id' => $validated['national_id'],
-            'address' => $validated['address'],
-            'phone' => $validated['phone'],
-            'emergency_contact' => $validated['emergency_contact'],
-        ]);
+        try {
+            $user = User::findOrFail($validated['user_id']);
 
-        // Departmana ata
-        $employee->departments()->attach($validated['department_id']);
+            if ($user->employee) {
+                return response()->json([
+                    'message' => 'Bu kullanıcı zaten çalışan olarak tanımlanmış.'
+                ], 422);
+            }
 
-        DB::commit();
+            $employee = $user->employee()->create([
+                'employee_number' => 'EMP-' . now()->format('Ymd') . '-' . str_pad(Employee::max('id') + 1, 4, '0', STR_PAD_LEFT),
+                'position' => $validated['position'],
+                'salary' => $validated['salary'],
+                'hire_date' => $validated['hire_date'],
+                'birth_date' => $validated['birth_date'],
+                'gender' => $validated['gender'],
+                'national_id' => $validated['national_id'],
+                'address' => $validated['address'],
+                'phone' => $validated['phone'],
+                'emergency_contact' => $validated['emergency_contact'],
+            ]);
 
-        return response()->json([
-            'message' => 'Çalışan başarıyla oluşturuldu',
-            'data' => $employee->load('user', 'departments')
-        ], 201);
+            $employee->departments()->attach($validated['department_id'], [
+                'position' => $validated['position'],
+                'start_date' => now(),
+                'is_primary' => true
+            ]);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Bir hata oluştu',
-            'error' => $e->getMessage()
-        ], 500);
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Çalışan başarıyla oluşturuldu',
+                'data' => $employee->load(['user', 'departments'])
+            ], 201);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            \Log::error('Çalışan kaydederken patladı:', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+
+            return response()->json([
+                'message' => 'Sunucu hatası oluştu',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
-
+    // Update Employee
     public function update(Request $request, Employee $employee)
     {
-        $validated = $this->validateEmployeeData($request, $employee->user_id);
-
-        DB::beginTransaction();
         try {
+            $validated = $this->validateEmployeeData($request, $employee->user_id);
+            DB::beginTransaction();
             $this->updateEmployee($employee, $validated);
             DB::commit();
 
@@ -110,6 +128,7 @@ class EmployeeController extends Controller
         }
     }
 
+    // Delete Employee
     public function destroy(Employee $employee)
     {
         DB::beginTransaction();
@@ -127,6 +146,7 @@ class EmployeeController extends Controller
         }
     }
 
+    // Assign Employee to Department
     public function assignToDepartment(Request $request, Employee $employee)
     {
         $validated = $request->validate([
@@ -151,16 +171,17 @@ class EmployeeController extends Controller
         }
     }
 
+    // Update Department Assignment
     public function updateDepartmentAssignment(Request $request, Employee $employee, Department $department)
     {
-        $validated = $request->validate([
-            'position' => 'required|string|max:255',
-            'end_date' => 'nullable|date|after:start_date',
-            'is_primary' => 'boolean'
-        ]);
-
-        DB::beginTransaction();
         try {
+            $validated = $request->validate([
+                'position' => 'required|string|max:255',
+                'end_date' => 'nullable|date|after:start_date',
+                'is_primary' => 'boolean'
+            ]);
+
+            DB::beginTransaction();
             $this->processAssignmentUpdate($employee, $department, $validated);
             DB::commit();
 
@@ -175,15 +196,21 @@ class EmployeeController extends Controller
         }
     }
 
+    // Show Assignment History
     public function assignmentHistory(Employee $employee)
     {
-        return response()->json([
-            'assignments' => $employee->departments()
-                ->orderByPivot('start_date', 'desc')
-                ->get()
-        ]);
+        try {
+            return response()->json([
+                'assignments' => $employee->departments()
+                    ->orderByPivot('start_date', 'desc')
+                    ->get()
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e);
+        }
     }
 
+    // Helpers
     private function validateEmployeeData(Request $request, $ignoreUserId = null)
     {
         $rules = [
@@ -196,7 +223,7 @@ class EmployeeController extends Controller
             'national_id' => ['required','string','max:20',Rule::unique('employees','national_id')->ignore($ignoreUserId,'user_id')],
             'address' => 'required|string|max:500',
             'phone' => 'required|string|max:15',
-            'emergency_contact' => 'required|string|max:15'
+            'emergency_contact' => 'required|string|max:50'
         ];
 
         return $request->validate($rules);

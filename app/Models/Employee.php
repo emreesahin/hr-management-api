@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Employee extends Model
 {
@@ -12,15 +13,15 @@ class Employee extends Model
         'emergency_contact', 'position', 'salary'
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function departments()
     {
-        return $this->belongsToMany(Department::class, 'employee_department')
-                   ->withPivot('position', 'start_date', 'end_date');
+        return $this->belongsToMany(Department::class, 'employee_department', 'employee_id', 'department_id')
+                    ->withPivot('position', 'start_date', 'end_date', 'is_primary');
     }
 
     public function payroll()

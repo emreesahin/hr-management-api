@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+
 use App\Http\Controllers\Controller;
 use App\Models\Department;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\Employee;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+
+
 
 class DepartmentController extends Controller
 {
@@ -100,17 +101,28 @@ class DepartmentController extends Controller
 
     // Department Details
 
+
     public function show(Department $department)
     {
         try {
+            $department->load(['manager', 'parent']);
+
+            // Doğru kullanım
+            $employees = Employee::with('user')
+                ->whereHas('departments', function ($query) use ($department) {
+                    $query->where('departments.id', $department->id)
+                        ->where(function ($pivotQuery) {
+                            $pivotQuery->whereNull('employee_department.end_date')
+                                       ->orWhere('employee_department.end_date', '>', now());
+                        });
+                })
+                ->get();
+
             return response()->json([
-                'department' => $department->load(['manager', 'parent']),
-                'employees' => $department->activeEmployees()
-                    ->select(['users.id', 'name', 'email'])
-                    ->withPivot('position', 'start_date')
-                    ->get(),
+                'department' => $department,
+                'employees' => $employees,
                 'stats' => [
-                    'employee_count' => $department->activeEmployees->count(),
+                    'employee_count' => $employees->count(),
                     'sub_departments' => $department->children()->count()
                 ]
             ]);
@@ -120,8 +132,8 @@ class DepartmentController extends Controller
                 'errors' => $e->getMessage()
             ]);
         }
-
     }
+
 
     // Update Department
 
@@ -253,10 +265,20 @@ class DepartmentController extends Controller
 
     public function hierarchy(Department $department)
     {
-        return response()->json([
-            'department' => $department->only(['id', 'name', 'manager_id']),
-            'children' => $this->getChildren($department)
-        ]);
+        try{
+            return response()->json([
+                'department' => $department->only(['id', 'name', 'manager_id']),
+                'children' => $this->getChildren($department)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Departman bilgileri getirilemedi',
+                'errors' => $e->getMessage()
+            ]);
+
+
+        }
     }
 
     // Department Report

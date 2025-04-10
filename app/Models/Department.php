@@ -159,4 +159,15 @@ class Department extends Model
             $department->children()->update(['parent_id' => null]);
         });
     }
+
+
+public function activeEmployeesRelation(): BelongsToMany
+{
+    return $this->belongsToMany(Employee::class, 'employee_department', 'department_id', 'employee_id')
+                ->withPivot('position', 'start_date', 'end_date');
+}
+
+
+
+
 }
