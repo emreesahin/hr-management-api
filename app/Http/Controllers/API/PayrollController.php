@@ -9,6 +9,7 @@ use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\PDF;
 
+
 class PayrollController extends Controller
 {
     public function index () {
@@ -31,66 +32,74 @@ class PayrollController extends Controller
         }
     }
 
-    public function store(Request $request) {
-
+    public function store(Request $request)
+    {
         try {
-
-            $validated = $request ->validate([
-                'employee_id' => 'required|exists:employee,id',
-                'period' => 'required|string',
-                'gross_salary' => 'required|numeric',
-                'deductions' => 'nullable|numeric',
-                'bonuses' => 'nullable|numeric',
-                'net_salary' => 'required|numeric',
-                'issued_at' => 'required|date',
-
+            $validated = $request->validate([
+                'employee_id' => 'required|exists:employees,id',
             ]);
 
-            $payroll = Payroll::create($validated);
 
-            return response() -> json([
+            $employee = Employee::findOrFail($validated['employee_id']);
+
+            $netSalary = $employee->salary;
+
+            //  Otomatik hesaplamalar (örnek oranlarla)
+            $deductions = $netSalary * 0.14; // SGK/stopaj kesintisi
+            $bonuses = $netSalary * 0.10;    // prim vb.
+            $grossSalary = $netSalary + $deductions - $bonuses;
+
+            $issuedAt = now();
+            $period = $issuedAt->format('Y-m');
+
+
+            $payroll = Payroll::create([
+                'employee_id'   => $employee->id,
+                'period'        => $period,
+                'gross_salary'  => round($grossSalary, 2),
+                'deductions'    => round($deductions, 2),
+                'bonuses'       => round($bonuses, 2),
+                'net_salary'    => round($netSalary, 2),
+                'issued_at'     => $issuedAt,
+            ]);
+
+            return response()->json([
                 'message' => 'Payroll created successfully',
                 'data' => $payroll
-            ]);
+            ], 201);
 
-        }
-
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Payroll not found',
+                'message' => 'Payroll could not be created',
                 'error' => $e->getMessage()
-            ], 404);
+            ], 500);
         }
-
-
     }
 
-    public function download($id) {
 
-        try{
-
+    public function download($id)
+    {
+        try {
             $payroll = Payroll::with('employee.user')->findOrFail($id);
-
             $user = auth()->user();
 
-            if($user->cannot('view', $payroll)) {
+            if ($user->cannot('view', $payroll)) {
                 return response()->json([
                     'message' => 'You do not have permission to view this payroll'
                 ], 403);
             }
 
-            $pdf = Pdf::loadView('pdf.payroll', compact('payroll'));
+            $pdf = PDF::loadView('pdf.payroll', compact('payroll'));
 
-            return $pdf->download('payroll_{$payroll->period}.pdf');
+            return $pdf->download("payroll_{$payroll->period}.pdf");
 
-        }   catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Payroll not found',
                 'error' => $e->getMessage()
             ], 404);
         }
-
-
     }
+
 
 }
