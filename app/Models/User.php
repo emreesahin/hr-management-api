@@ -14,6 +14,9 @@ class User extends Authenticatable
     use HasRoles, HasFactory, Notifiable,HasApiTokens;
 
 
+    protected $guard_name = 'api';
+
+
     protected $fillable = [
         'name',
         'email',
