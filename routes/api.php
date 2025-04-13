@@ -65,7 +65,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Leave Management (izin sistemi)
     Route::prefix('leaves')->group(function () {
         Route::post('/', [LeaveController::class, 'store']);
-        // İleride: Route::get('/pending', [LeaveController::class, 'pending']) gibi onaylama işlemleri
+        Route::put('/{id}/approve', [LeaveController::class, 'approve']);
+        Route::put('/{id}/reject', [LeaveController::class, 'reject']);
     });
 
     // HR Dashboard

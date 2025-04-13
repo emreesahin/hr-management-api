@@ -1,4 +1,4 @@
-<h2>Yeni İzin Talebi</h2>
+<h2>İzin Talebi Reddedildi</h2>
 
 <p><strong>Çalışan:</strong> {{ $employee->user->name }} ({{ $employee->user->email }})</p>
 <p><strong>Başlangıç Tarihi:</strong> {{ $leave->start_date }}</p>

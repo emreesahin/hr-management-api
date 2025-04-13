@@ -5,10 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Mail\LeaveRequestMail;
+use App\Mail\LeaveApprovedMail;
+use App\Mail\LeaveRejectedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Leave;
 use App\Models\Employee;
 use App\Models\User;
+use App\Models\Department;
 
 class LeaveController extends Controller
 {
@@ -16,7 +19,6 @@ class LeaveController extends Controller
 
         try{
             $validated = $request->validate([
-                'employee_id' => 'required|exists:employees,id',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
                 'reason' => 'required|string|max:255',
@@ -26,7 +28,7 @@ class LeaveController extends Controller
 
             $days  = now()->parse($validated['start_date'])->diffInDaysFiltered(function($date){
                 return $date->isWeekday();
-            } , now()->parse($validated['end_date']));
+            } , now()->parse($validated['end_date'])) +1;
 
             if($employee->annual_leave_days < $days) {
                 return response()->json([
@@ -36,7 +38,8 @@ class LeaveController extends Controller
             }
 
             $leave = Leave::create([
-                'employee_id' => $validated['employee_id'],
+                'employee_id' => $employee->id,
+                'department' => $employee->department,
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date'],
                 'reason' => $validated['reason'],
@@ -46,9 +49,8 @@ class LeaveController extends Controller
 
             $hrEmails = User::role('hr')->pluck('email')->toArray();
 
-            foreach ($hrEmails as $email) {
-                Mail::to($email)->send(new LeaveRequestMail($leave));
-            }
+            Mail::to($hrEmails)->send(new LeaveRequestMail($leave));
+
 
 
             return response()->json([
@@ -64,4 +66,92 @@ class LeaveController extends Controller
         }
 
     }
+
+    public function approve($id) {
+
+        try{
+
+            if (!auth()->user()->hasRole(['hr', 'admin'])) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Yetkisiz işlem'
+                ], 403);
+            }
+
+            $leave = Leave::findOrFail($id);
+
+
+            if($leave -> status !== 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Request has already proceed'
+                ], 400);
+            }
+
+            $leave->update(['status' => 'approved']);
+
+            $employee = $leave->employee;
+            $employee->annual_leave_days -= $leave->duration;
+            $employee->save();
+
+            $employeeEmail = $employee->user->email;
+
+            Mail::to($employeeEmail)->send(new LeaveApprovedMail($leave));
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Request approved successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ],422);
+        }
+
+
+    }
+
+    public function reject($id) {
+        try{
+
+        if (!auth()->user()->hasRole(['hr', 'admin'])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Yetkisiz işlem'
+            ], 403);
+            }
+
+        $leave = Leave::findOrFail($id);
+
+        if($leave->status !== 'pending') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Request has already proceed'
+            ]);
+        }
+
+        $leave->update(['status' => 'rejected']);
+
+        $employee = $leave->employee;
+        $employeeEmail = $employee->user->email;
+
+        Mail::to($employeeEmail)->send(new LeaveRejectedMail($leave));
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Request rejected successfully'
+        ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ],422);
+        }
+
+    }
+
 }

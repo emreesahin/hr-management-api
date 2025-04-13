@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class LeaveRequestMail extends Mailable
+class LeaveRejectedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,8 +20,8 @@ class LeaveRequestMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Yeni İzin Talebi')
-                    ->view('emails.leave_request')
+        return $this->subject('İzin Reddedildi')
+                    ->view('emails.leave_rejected')
                     ->with([
                         'leave' => $this->leave,
                         'employee' => $this->leave->employee,
