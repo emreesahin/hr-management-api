@@ -11,29 +11,29 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Leave;
 use App\Models\Employee;
 use App\Models\User;
-use App\Models\Department;
 
 class LeaveController extends Controller
 {
-    public function store(Request $request) {
-
-        try{
+    // İzin Talebi Oluştur
+    public function store(Request $request)
+    {
+        try {
             $validated = $request->validate([
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
                 'reason' => 'required|string|max:255',
             ]);
 
-            $employee = Employee::where('user_id', auth()->id())->firstOrFail();
+            $employee = Employee::where('user_id', auth('employee')->id())->firstOrFail();
 
-            $days  = now()->parse($validated['start_date'])->diffInDaysFiltered(function($date){
+            $days = now()->parse($validated['start_date'])->diffInDaysFiltered(function ($date) {
                 return $date->isWeekday();
-            } , now()->parse($validated['end_date'])) +1;
+            }, now()->parse($validated['end_date'])) + 1;
 
-            if($employee->annual_leave_days < $days) {
+            if ($employee->annual_leave_days < $days) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'You do not have enough annual leave days to apply for this leave.'
+                    'message' => 'Yeterli yıllık izniniz yok.',
                 ], 422);
             }
 
@@ -47,44 +47,40 @@ class LeaveController extends Controller
                 'status' => 'pending',
             ]);
 
-            $hrEmails = User::role('hr')->pluck('email')->toArray();
+            $hrEmails = User::role('hr', 'hr')->pluck('email')->toArray();
 
             Mail::to($hrEmails)->send(new LeaveRequestMail($leave));
 
-
-
             return response()->json([
                 'status' => true,
-                'message' => 'Leave request created successfully',
-                'leave' => $leave
+                'message' => 'İzin talebi başarıyla oluşturuldu.',
+                'leave' => $leave,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage()
+                'message' => 'Hata: ' . $e->getMessage(),
             ], 422);
         }
-
     }
 
-    public function approve($id) {
-
-        try{
-
-            if (!auth()->user()->hasRole(['hr', 'admin'])) {
+    // İzin Onayla
+    public function approve($id)
+    {
+        try {
+            if (!auth('hr')->user()->hasRole('hr', 'hr')) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Yetkisiz işlem'
+                    'message' => 'Yetkisiz işlem',
                 ], 403);
             }
 
             $leave = Leave::findOrFail($id);
 
-
-            if($leave -> status !== 'pending') {
+            if ($leave->status !== 'pending') {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Request has already proceed'
+                    'message' => 'Bu istek zaten işlenmiş.',
                 ], 400);
             }
 
@@ -95,63 +91,55 @@ class LeaveController extends Controller
             $employee->save();
 
             $employeeEmail = $employee->user->email;
-
             Mail::to($employeeEmail)->send(new LeaveApprovedMail($leave));
 
             return response()->json([
                 'status' => true,
-                'message' => 'Request approved successfully'
+                'message' => 'İzin talebi onaylandı.',
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage(),
-            ],422);
+                'message' => 'Hata: ' . $e->getMessage(),
+            ], 422);
         }
-
-
     }
 
-    public function reject($id) {
-        try{
-
-        if (!auth()->user()->hasRole(['hr', 'admin'])) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Yetkisiz işlem'
-            ], 403);
+    // İzin Reddet
+    public function reject($id)
+    {
+        try {
+            if (!auth('hr')->user()->hasRole('hr', 'hr')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Yetkisiz işlem',
+                ], 403);
             }
 
-        $leave = Leave::findOrFail($id);
+            $leave = Leave::findOrFail($id);
 
-        if($leave->status !== 'pending') {
+            if ($leave->status !== 'pending') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bu istek zaten işlenmiş.',
+                ]);
+            }
+
+            $leave->update(['status' => 'rejected']);
+
+            $employee = $leave->employee;
+            $employeeEmail = $employee->user->email;
+            Mail::to($employeeEmail)->send(new LeaveRejectedMail($leave));
+
             return response()->json([
-                'status' => false,
-                'message' => 'Request has already proceed'
+                'status' => true,
+                'message' => 'İzin talebi reddedildi.',
             ]);
-        }
-
-        $leave->update(['status' => 'rejected']);
-
-        $employee = $leave->employee;
-        $employeeEmail = $employee->user->email;
-
-        Mail::to($employeeEmail)->send(new LeaveRejectedMail($leave));
-
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Request rejected successfully'
-        ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage(),
-            ],422);
+                'message' => 'Hata: ' . $e->getMessage(),
+            ], 422);
         }
-
     }
-
 }

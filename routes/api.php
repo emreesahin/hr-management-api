@@ -8,10 +8,17 @@ use App\Http\Controllers\API\EmployeeController;
 use App\Http\Controllers\API\PayrollController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\CandidateController;
 
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+
+Route::prefix('candidate')->group(function () {
+    Route::post('/register', [CandidateController::class, 'register']);
+    Route::post('/login', [CandidateController::class, 'login']);
+
+});
 
 // Authenticated Routes (Sanctum)
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -69,11 +76,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}/reject', [LeaveController::class, 'reject']);
     });
 
-    // HR Dashboard
-    Route::prefix('hr')->middleware('role:hr|admin')->group(function () {
-        Route::get('/dashboard', 'HrController@dashboard');
-        Route::get('/statistics', 'HrController@statistics');
+    // // HR Dashboard
+    // Route::prefix('hr')->middleware('role:hr|admin')->group(function () {
+    //     Route::get('/dashboard', 'HrController@dashboard');
+    //     Route::get('/statistics', 'HrController@statistics');
+    // });
+
+    // Candidate Management
+    Route::middleware('auth:candidate')->prefix('candidates')->group(function () {
+        Route::post('/logout', [CandidateController::class, 'logout']);
+        Route::post('/cv', [CandidateController::class, 'uploadCV']);
     });
+
+
 });
 
 // Fallback Route

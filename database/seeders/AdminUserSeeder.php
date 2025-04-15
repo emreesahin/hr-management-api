@@ -12,45 +12,51 @@ use Illuminate\Support\Facades\Hash;
 class AdminUserSeeder extends Seeder
 {
     public function run()
-    {
-        // Veritabanını sıfırla (opsiyonel)
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('model_has_roles')->truncate();
-        DB::table('roles')->truncate();
-        DB::table('users')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+{
+    // Veritabanını sıfırla
+    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+    DB::table('model_has_roles')->truncate();
+    DB::table('roles')->truncate();
+    DB::table('permissions')->truncate(); // <-- önemli
+    DB::table('users')->truncate();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Admin rolünü oluştur
-        $adminRole = Role::firstOrCreate([
-            'name' => 'admin',
-            'guard_name' => 'api'
+    // Admin rolünü oluştur (guard_name 'api' ile aynı olmalı)
+    $adminRole = Role::firstOrCreate([
+        'name' => 'admin',
+        'guard_name' => 'admin'
+    ]);
+
+    // İzinleri oluştur (aynı guard_name ile)
+    $permissions = [
+        'view departments',
+        'create departments',
+        'edit departments',
+        'delete departments',
+        'assign employees'
+    ];
+
+    foreach ($permissions as $permission) {
+        Permission::firstOrCreate([
+            'name' => $permission,
+            'guard_name' => 'admin'
         ]);
-
-        // Temel izinleri oluştur
-        $permissions = [
-            'view departments',
-            'create departments',
-            'edit departments',
-            'delete departments',
-            'assign employees'
-        ];
-
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate([
-                'name' => $permission,
-                'guard_name' => 'api'
-            ]);
-        }
-
-        // Tüm permission'ları ata
-        $adminRole->syncPermissions(Permission::all());
-
-        // Admin kullanıcısını oluştur
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@hr.com',
-            'password' => Hash::make('password123'),
-            'is_active' => true
-        ])->assignRole($adminRole);
     }
+
+    // Rol ile izinleri eşleştir
+    $adminRole->syncPermissions($permissions);
+
+    // Admin kullanıcısını oluştur
+    $adminUser = User::create([
+        'name' => 'Admin User',
+        'email' => 'admin@hr.com',
+        'password' => Hash::make('password123'),
+        'is_active' => true
+    ]);
+
+    // Admin rolünü ata
+    $admin->assignRole(Role::findByName('admin', 'admin'));
+
+}
+
 }

@@ -28,7 +28,8 @@ class AuthController extends Controller
                 'is_active' => true
             ]);
 
-            $user->assignRole('employee');
+            $user->assignRole(\Spatie\Permission\Models\Role::findByName('employee', 'employee'));
+
 
             return response()->json([
                 'message' => 'Kullanıcı başarıyla kaydedildi',
@@ -63,7 +64,7 @@ class AuthController extends Controller
 
            $user->tokens()->delete();
 
-           $token = $user->createToken('api-token')->plainTextToken;
+           $token = $user->createToken('api-token', ['*'])->plainTextToken;
 
            return response()->json([
                'message' => 'Giriş başarılı',

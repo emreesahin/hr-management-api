@@ -29,14 +29,24 @@ return [
             'hash' => false,
         ],
 
-        'hr-api' => [
+        'employee'=>[
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
+        'hr' => [
             'driver' => 'sanctum',
             'provider' => 'hr_users',
         ],
 
-        'admin-api' => [
+        'admin' => [
             'driver' => 'sanctum',
             'provider' => 'admins',
+        ],
+
+        'candidate' => [
+            'driver' => 'sanctum',
+            'provider' => 'candidates',
         ],
     ],
 
@@ -45,27 +55,29 @@ return [
     | User Providers
     |--------------------------------------------------------------------------
     */
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
+   'providers' => [
 
-        'hr_users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\HrUser::class,
-        ],
-
-        'admins' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'employees',
-        // ],
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
     ],
+
+    'hr_users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+
+    'admins' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+
+    'candidates' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Candidate::class,
+    ],
+
+],
 
     /*
     |--------------------------------------------------------------------------

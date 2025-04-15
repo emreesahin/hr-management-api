@@ -48,7 +48,7 @@ class UserController extends Controller
             ], 400);
         }
 
-        $user->assignRole('hr');
+        $user->assignRole(\Spatie\Permission\Models\Role::findByName('hr', 'hr'));
 
         return response()->json([
             'message' => 'Kullanıcı HR olarak yetkilendirildi.',

@@ -11,12 +11,13 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
         // Roller
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'api']);
-        $hrRole = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'api']);
-        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'api']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'admin']);
+        $hrRole = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'hr']);
+        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'employee']);
+        $candidateRole = Role::firstOrCreate(['name' => 'candidate', 'guard_name' => 'candidate']);
 
-        // İzinler
-        $permissions = [
+        // ADMIN izinleri
+        $adminPermissions = [
             'view users',
             'create users',
             'edit users',
@@ -25,18 +26,23 @@ class RolePermissionSeeder extends Seeder
             'assign roles',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'api']);
+        foreach ($adminPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'admin']);
         }
+        $adminRole->syncPermissions($adminPermissions);
 
-        // Admin rolüne tüm izinleri ver
-        $adminRole->syncPermissions(Permission::all());
-
-        // HR rolüne bazı izinler ver
-        $hrRole->syncPermissions([
+        // HR izinleri
+        $hrPermissions = [
             'view users',
             'create users',
             'edit users',
-        ]);
+        ];
+
+        foreach ($hrPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'hr']);
+        }
+        $hrRole->syncPermissions($hrPermissions);
+
+        // Employee ve Candidate izinleri gerekiyorsa benzer şekilde aşağıya eklenebilir
     }
 }
