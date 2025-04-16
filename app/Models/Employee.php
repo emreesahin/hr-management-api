@@ -16,6 +16,7 @@ class Employee extends Model
         'emergency_contact', 'position', 'salary'
     ];
 
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

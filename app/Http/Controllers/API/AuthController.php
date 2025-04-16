@@ -94,5 +94,61 @@ class AuthController extends Controller
         ]);
     }
 
+    //Update
+    public function update(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            $validated = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'email' => "sometimes|email|unique:users,email,{$user->id}",
+                'password' => 'sometimes|string|min:8|confirmed'
+            ]);
+
+            if (isset($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            }
+
+            $user->update($validated);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kullanıcı bilgileri güncellendi.',
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Kullanıcı bilgileri güncellenemedi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
+
+    //Delete
+    public function destroy(Request $request) {
+        try {
+
+
+            $user = $request->user();
+            $user->delete();
+            $user->tokens()->delete();
+            return response()->json([
+                'message' => 'Hesabınız başarıyla silindi.'
+            ], 204);
+
+
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Kullanıcı silinemedi',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+
+ }
+}
 

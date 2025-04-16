@@ -301,6 +301,41 @@ class DepartmentController extends Controller
         ]);
     }
 
+    // Cost Analysis
+
+    public function costAnalysis(Department $department)
+    {
+        try {
+            // Sadece gerçekten Employee modelinden gelen kayıtları al
+            $employees = \App\Models\Employee::whereHas('departments', function ($q) use ($department) {
+                $q->where('departments.id', $department->id)
+                  ->where(function ($q) {
+                      $q->whereNull('employee_department.end_date')
+                        ->orWhere('employee_department.end_date', '>', now());
+                  });
+            })->get();
+
+            $employeeCount = $employees->count();
+            $totalCost = $employees->sum('salary');
+            $averageCost = $employeeCount > 0 ? $totalCost / $employeeCount : 0;
+
+            return response()->json([
+                'department' => $department->only(['id', 'name']),
+                'employee_count' => $employeeCount,
+                'total_cost' => round($totalCost, 2),
+                'average_cost' => round($averageCost, 2)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Maliyet analizi alınamadı',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
     // Private Functions
 
     private function buildTree($departments)

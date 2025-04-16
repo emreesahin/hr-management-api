@@ -58,8 +58,8 @@ class Department extends Model
      */
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employee_department', 'department_id', 'employee_id')
-            ->withPivot('position', 'start_date', 'end_date');
+        return $this->belongsToMany(User::class, 'employee_department', 'department_id', 'employee_id')
+                    ->withPivot(['position', 'start_date', 'end_date']);
     }
 
     // Scopes
@@ -91,10 +91,9 @@ class Department extends Model
     public function activeEmployees()
     {
         return $this->employees()
-                    ->wherePivotNull('end_date')
-                    ->orWherePivot('end_date', '>', now());
+            ->whereNull('end_date')
+            ->orWhere('end_date', '>', now());
     }
-
     /**
      * Check if user is manager of another department
      */
@@ -166,7 +165,6 @@ public function activeEmployeesRelation(): BelongsToMany
     return $this->belongsToMany(Employee::class, 'employee_department', 'department_id', 'employee_id')
                 ->withPivot('position', 'start_date', 'end_date');
 }
-
 
 
 

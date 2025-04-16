@@ -26,6 +26,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::put('/me/update', [AuthController::class, 'update']);
+    Route::delete('/me/destroy', [AuthController::class, 'destroy']);
 
     // User Management
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:view users'); //
@@ -46,6 +48,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{department}/assign', [DepartmentController::class, 'assignEmployee']);
         Route::get('/{department}/hierarchy', [DepartmentController::class, 'hierarchy']);
         Route::get('/{department}/report', [DepartmentController::class, 'report']);
+        Route::get('/{department}/cost-analysis', [DepartmentController::class, 'costAnalysis']);
     });
 
     // Employee Management
@@ -86,6 +89,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('auth:candidate')->prefix('candidates')->group(function () {
         Route::post('/logout', [CandidateController::class, 'logout']);
         Route::post('/cv', [CandidateController::class, 'uploadCV']);
+        Route::put('/me/update', [CandidateController::class, 'update']);
+        Route::delete('/me/destroy', [CandidateController::class, 'destroy']);
+    });
+
+    Route::middleware(['role:hr|admin'])->prefix('candidates-hr')->group(function () {
+        Route::get('/candidates', [CandidateController::class, 'index']);
+        Route::get('/candidates/{id}', [CandidateController::class, 'show']);
+        Route::put('/candidates/{id}/approve', [CandidateController::class, 'approve']);
+        Route::put('/candidates/{id}/reject', [CandidateController::class, 'reject']);
+        Route::put('/candidates/{id}/note', [CandidateController::class, 'updateNote']);
+        Route::post('/candidates/{id}/favorite', [CandidateController::class, 'toggleFavorite']);
     });
 
 
