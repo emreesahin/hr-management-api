@@ -8,7 +8,7 @@ HR Management API is a RESTful Laravel 12 backend system designed to manage huma
 > 🔗 [https://hr-management-api-main-vs9swg.laravel.cloud](https://hr-management-api-main-vs9swg.laravel.cloud)
 
 > 📫 **Updated Postman Collection:**  
-> [Download Collection](./HR_Management_API.postman_collection.json)
+> [Download Collection](./postman_collection/HR_Management_API.postman_collection.json)
 
 ---
 
