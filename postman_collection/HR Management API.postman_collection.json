@@ -1,0 +1,1411 @@
+{
+	"info": {
+		"_postman_id": "72c17308-628a-47dc-9662-4a1fe355f008",
+		"name": "HR Management API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34689302"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "User Info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/me",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"deleted@example.com\",\n  \"password\": \"password\"\n}\n"
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/login",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Deleted User\",\n    \"email\": \"deleted@example.com\",\n    \"password\": \"password\",\n    \"password_confirmation\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/register",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|YMyY6ZUjYVxheKbIfvnlVIzyXAAnRcQQkNzAEDNbbc3b6975",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/logout",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Promote to HR",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/users/3/promote-hr",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"users",
+								"3",
+								"promote-hr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "3|WANWnhTafYNf98SWULAfKKZXWgCDTm4gpEvCjk2i7c26525f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Emre Şahin\",\r\n  \"email\": \"emresahin@example.com\",\r\n  \"password\": \"password\",\r\n  \"password_confirmation\": \"password\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/me/update",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"me",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "5|bBjVXp0kmrCpYV0objonZSn4SgjpOtvOmuVf1z9Dcf33c8c5",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/me/destroy",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"me",
+								"destroy"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Department",
+			"item": [
+				{
+					"name": "Get Departments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Department Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/1",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Department Hierarchy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/1/hierarchy",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1",
+								"hierarchy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Yazılım\",\r\n  \"description\": \"Backend Ekibi\",\r\n  \"is_active\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Employee //",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"employee_id\": 4,\r\n  \"position\": \"Yazılım Uzmanı\",\r\n  \"start_date\": \"2023-01-01\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/1/assign",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|vjrZVHUAyehbvP9NonNEmo6xSR6e9vRFesCQB5fr1c86b769",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Güncellenmiş Yazılım\",\r\n  \"manager_id\": null,\r\n  \"is_active\": false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/1",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Department",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "2|fzIaR0fRpjcCoHEHEUDn5bYqyoB0w3OcJE87zukided2e401",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/3",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cost Analisys",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/departments/1/cost-analysis",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"departments",
+								"1",
+								"cost-analysis"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "Get Employees",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user_id\": 4,\r\n  \"position\": \"Yazılım Geliştirici\",\r\n  \"salary\": 42000,\r\n  \"hire_date\": \"2024-01-10\",\r\n  \"birth_date\": \"1995-06-15\",\r\n  \"gender\": \"male\",\r\n  \"national_id\": \"12345678901\",\r\n  \"address\": \"İstanbul, Türkiye\",\r\n  \"phone\": \"+905551112233\",\r\n  \"emergency_contact\": \"Annesi - +905551110000\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees/",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assignment History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees/1/history",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Employee from User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user_id\": 4,\r\n  \"department_id\": 1,\r\n  \"position\": \"Fullstack Developer\",\r\n  \"salary\": 50000,\r\n  \"hire_date\": \"2024-04-01\",\r\n  \"birth_date\": \"1995-05-15\",\r\n  \"gender\": \"female\",\r\n  \"national_id\": \"12345678911\",\r\n  \"address\": \"İstanbul\",\r\n  \"phone\": \"+905551234567\",\r\n  \"emergency_contact\": \"Annesi - +905551100000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reassign Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|mKZmlHcj4KKRXvvE4clCaw7A1mU59oqUqn02d1Tt3aa89d43",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"department_id\": 2,\r\n  \"position\": \"Backend Developer\",\r\n  \"is_primary\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees/2/assign",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees",
+								"2",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user_id\": 4,\r\n  \"position\": \"Senior Developer\",\r\n  \"salary\": 65000,\r\n  \"hire_date\": \"2023-10-01\",\r\n  \"birth_date\": \"1990-04-15\",\r\n  \"gender\": \"male\",\r\n  \"national_id\": \"98765432100\",\r\n  \"address\": \"Ankara, Türkiye\",\r\n  \"phone\": \"+905550000001\",\r\n  \"emergency_contact\": \"Eşi - +905550000002\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees/1",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|mKZmlHcj4KKRXvvE4clCaw7A1mU59oqUqn02d1Tt3aa89d43",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/employees/1",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"employees",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payrolls",
+			"item": [
+				{
+					"name": "List Own Payrolls",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "3|WANWnhTafYNf98SWULAfKKZXWgCDTm4gpEvCjk2i7c26525f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/payrolls",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"payrolls"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payroll (Admin/HR)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employee_id\": 1\n}\n"
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/payrolls",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"payrolls"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Payroll PDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "3|WANWnhTafYNf98SWULAfKKZXWgCDTm4gpEvCjk2i7c26525f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/payrolls/1/download",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"payrolls",
+								"1",
+								"download"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Leaves",
+			"item": [
+				{
+					"name": "Leave Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "3|WANWnhTafYNf98SWULAfKKZXWgCDTm4gpEvCjk2i7c26525f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"employee_id\": 1,\r\n  \"start_date\": \"2025-04-20\",\r\n  \"end_date\": \"2025-04-24\",\r\n  \"reason\": \"Aile ziyareti\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/leaves",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"leaves"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Approve",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/leaves/3/approve",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"leaves",
+								"3",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Reject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/leaves/2/reject",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"leaves",
+								"2",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Candidate",
+			"item": [
+				{
+					"name": "Candidate Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Deleted Candidate\",\r\n  \"email\": \"deletedcandidate@example.com\",\r\n  \"password\": \"123456\",\r\n  \"password_confirmation\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidate/register",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidate",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Candidate Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"deletedcandidate@example.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidate/login",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidate",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Cv",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "4|c3FkecR6tuPK4oI99oN5PUpOBS02FJX6gSd4FFxb0c41e15b",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "cv",
+									"type": "file",
+									"src": "/C:/Users/emre1/OneDrive/Masaüstü/Emre_Şahin_Cv yeni.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates/cv",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates",
+								"cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Candidate Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "4|c3FkecR6tuPK4oI99oN5PUpOBS02FJX6gSd4FFxb0c41e15b",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Yeni İsim\",\r\n  \"email\": \"yeniemail@example.com\",\r\n  \"password\": \"password\",\r\n  \"password_confirmation\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates/me/update",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates",
+								"me",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Candidate Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "6|16WmhnKyjhN7qWAX40aCrPVeaUVfxe0TRZpKzUAf909da718",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates/me/destroy",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates",
+								"me",
+								"destroy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Candidate List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates-hr/candidates",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates-hr",
+								"candidates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cv Detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates-hr/candidates/1",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates-hr",
+								"candidates",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Approved",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates-hr/candidates/1/approve",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates-hr",
+								"candidates",
+								"1",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Rejected",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates-hr/candidates/1/reject",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates-hr",
+								"candidates",
+								"1",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Note",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "1|27y1x2IJfFzzYKnmRZEJxUnhewY0Lw8RKd4ULVe87917da32",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"note\": \"CV çok iyi, React ve Laravel bilgisi güçlü. Görüşmeye çağrılabilir.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://hr-management-api-main-vs9swg.laravel.cloud/api/candidates-hr/candidates/1/note",
+							"protocol": "https",
+							"host": [
+								"hr-management-api-main-vs9swg",
+								"laravel",
+								"cloud"
+							],
+							"path": [
+								"api",
+								"candidates-hr",
+								"candidates",
+								"1",
+								"note"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Favorite",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
