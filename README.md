@@ -1,6 +1,16 @@
+
 # HR Management API
 
 HR Management API is a RESTful Laravel 12 backend system designed to manage human resources operations such as employee records, departments, payroll, leaves, and candidate applications.
+
+> ✅ **Live Deployment Available:**  
+> You can now test the API live at:  
+> 🔗 [https://hr-management-api-main-vs9swg.laravel.cloud](https://hr-management-api-main-vs9swg.laravel.cloud)
+
+> 📫 **Updated Postman Collection:**  
+> [Download Collection](./HR_Management_API_UPDATED.postman_collection.json)
+
+---
 
 ## 🚀 Features
 
